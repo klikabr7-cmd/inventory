@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4A3728">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="מלאי משרד">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>מלאי משרד</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f5f0eb;--bg3:#ede6dd;
+  --text:#1a1208;--text2:#5c4a34;--text3:#8c7a66;
+  --border:#d4c5b0;--border2:#b8a48a;
+  --accent:#4A3728;--accent2:#6B4226;
+  --green-bg:#eaf3de;--green-text:#27500a;
+  --amber-bg:#faeeda;--amber-text:#633806;
+  --red-bg:#fcebeb;--red-text:#791f1f;
+  --radius:10px;--radius-lg:14px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1208;--bg2:#2a1f12;--bg3:#362a1a;
+    --text:#f5ede0;--text2:#c9a882;--text3:#8c7a66;
+    --border:#4a3728;--border2:#6b4a2a;
+    --accent:#c9a882;--accent2:#e8c99a;
+    --green-bg:#173404;--green-text:#c0dd97;
+    --amber-bg:#412402;--amber-text:#fac775;
+    --red-bg:#501313;--red-text:#f7c1c1;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app-header{background:var(--accent);color:#f5ede0;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.app-header h1{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px}
+.app-header .sub{font-size:12px;opacity:.75;margin-top:1px}
+.header-actions{display:flex;gap:8px}
+.main{padding:12px 16px;max-width:800px;margin:0 auto}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.metric{background:var(--bg2);border-radius:var(--radius);padding:10px 12px}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.metric-value{font-size:18px;font-weight:600;color:var(--text)}
+.alerts{margin-bottom:10px}
+.alert{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:var(--radius);font-size:13px;margin-bottom:6px;line-height:1.4}
+.alert-danger{background:var(--red-bg);color:var(--red-text)}
+.alert-warning{background:var(--amber-bg);color:var(--amber-text)}
+.alert-info{background:var(--green-bg);color:var(--green-text)}
+.section-label{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.04em;margin-bottom:8px;margin-top:14px;text-transform:uppercase}
+.item-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px;transition:border-color .15s}
+.item-card.low{border-color:#EF9F27;border-width:1px}
+.item-card.out{border-color:#E24B4A;border-width:1px}
+.item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.item-name{font-size:14px;font-weight:500;color:var(--text)}
+.item-badges{display:flex;align-items:center;gap:6px}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500}
+.badge-ok{background:var(--green-bg);color:var(--green-text)}
+.badge-low{background:var(--amber-bg);color:var(--amber-text)}
+.badge-out{background:var(--red-bg);color:var(--red-text)}
+.item-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.qty-ctrl{display:flex;align-items:center;gap:8px}
+.qty-btn{width:32px;height:32px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none}
+.qty-btn:active{background:var(--bg3);transform:scale(.95)}
+.qty-num{font-size:18px;font-weight:600;min-width:32px;text-align:center;color:var(--text)}
+.qty-unit{font-size:12px;color:var(--text3)}
+.item-meta{display:flex;gap:12px;font-size:12px;color:var(--text3)}
+.item-meta span{display:flex;align-items:center;gap:3px}
+.usage-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
+.usage-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.remind-card{background:var(--bg2);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:4px}
+.remind-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.remind-row label{color:var(--text3)}
+.remind-row input[type=number]{width:52px;padding:5px 8px;font-size:13px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text)}
+.btn{border:0.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);cursor:pointer;padding:7px 12px;font-size:13px;-webkit-tap-highlight-color:transparent}
+.btn:active{background:var(--bg3);transform:scale(.97)}
+.btn-accent{background:var(--accent);color:#f5ede0;border-color:transparent}
+.btn-accent:active{opacity:.85}
+.btn-sm{padding:5px 9px;font-size:12px}
+.ai-card{border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px}
+.ai-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-text{font-size:13px;color:var(--text);line-height:1.65;white-space:pre-wrap;min-height:32px}
+.ai-text.loading{color:var(--text3);font-style:italic}
+.ai-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.add-card{background:var(--bg2);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px}
+.add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:11px;color:var(--text3)}
+.field input{padding:7px 10px;font-size:14px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text)}
+.log-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text2)}
+.log-item:last-child{border-bottom:none}
+.log-time{color:var(--text3);white-space:nowrap;margin-right:8px}
+svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;flex-shrink:0}
+.fab{position:fixed;bottom:20px;left:16px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#f5ede0;border:none;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);-webkit-tap-highlight-color:transparent;z-index:10}
+.fab:active{transform:scale(.93)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.sheet{background:var(--bg);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:500px}
+.sheet-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.sheet h3{font-size:16px;font-weight:500;margin-bottom:14px}
+@media(min-width:600px){
+  .metrics{grid-template-columns:repeat(4,1fr)}
+  .overlay{align-items:center}
+  .sheet{border-radius:16px;margin-bottom:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <h1>
+      <svg class="icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      מלאי משרד
+    </h1>
+    <div class="sub" id="last-check-label">טוען...</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-sm" onclick="askAI('analyze')" style="color:#f5ede0;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1)">✨ ניתוח</button>
+    <button class="btn btn-sm" onclick="askAI('order')" style="color:#f5ede0;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1)">🛒 הזמנה</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="metrics" id="metrics"></div>
+  <div class="alerts" id="alerts"></div>
+
+  <div class="section-label">תזכורת בדיקה</div>
+  <div class="remind-card">
+    <div class="remind-row">
+      <label>כל</label>
+      <input type="number" id="remind-days" value="7" min="1" max="60" step="1">
+      <label>ימים — הבאה:</label>
+      <strong id="next-remind"></strong>
+      <button class="btn btn-sm" onclick="setReminder()">שמור</button>
+      <button class="btn btn-sm btn-accent" onclick="checkNow()">✓ בדקתי עכשיו</button>
+    </div>
+  </div>
+
+  <div class="section-label">פריטים במלאי</div>
+  <div id="items-list"></div>
+
+  <div class="section-label">ניתוח חכם</div>
+  <div class="ai-card">
+    <div class="ai-title">✨ AI</div>
+    <div class="ai-text loading" id="ai-text">לחצי על "ניתוח" או "הזמנה" בסרגל העליון.</div>
+    <div class="ai-actions" id="ai-actions"></div>
+  </div>
+
+  <div class="section-label">יומן</div>
+  <div id="log-list"></div>
+  <div style="height:80px"></div>
+</div>
+
+<button class="fab" onclick="openAdd()" aria-label="הוסף פריט">+</button>
+
+<div class="overlay" id="overlay" onclick="closeAdd()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <h3>הוסף מוצר חדש</h3>
+    <div class="add-grid">
+      <div class="field" style="grid-column:1/-1"><label>שם המוצר</label><input id="fn" type="text" placeholder="נס קפה עלית 200 גרם"></div>
+      <div class="field"><label>כמות</label><input id="fq" type="number" min="0" placeholder="3"></div>
+      <div class="field"><label>יחידה</label><input id="fu" type="text" placeholder="קופסאות"></div>
+      <div class="field"><label>מינימום</label><input id="fm" type="number" min="0" placeholder="2"></div>
+      <div class="field"><label>מחיר שופרסל ₪</label><input id="fp" type="number" min="0" step="0.5" placeholder="22"></div>
+      <div class="field"><label>צריכה שבועית</label><input id="fw" type="number" min="0" step="0.1" placeholder="1"></div>
+      <div class="field"><label>יחידת צריכה</label><input id="fwu" type="text" placeholder="קופסאות"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-accent" style="flex:1;padding:10px" onclick="addItem()">הוסף לרשימה</button>
+      <button class="btn" onclick="closeAdd()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STOR='office-pwa-v2';
+const LOGS='office-pwa-log-v2';
+const REMS='office-pwa-remind-v2';
+const HIST='office-pwa-hist-v2';
+
+const DEF=[
+  {id:1,name:'נס קפה עלית',qty:3,unit:'קופסאות',min:2,price:22,weekUsage:1},
+  {id:2,name:'תה ויסוצקי שחור',qty:5,unit:'קופסאות',min:2,price:25,weekUsage:0.5},
+  {id:3,name:'סוכר לבן 1 ק"ג',qty:1,unit:'שקיות',min:2,price:7,weekUsage:0.5},
+  {id:4,name:'סוכר חום 1 ק"ג',qty:2,unit:'שקיות',min:1,price:9,weekUsage:0.3},
+  {id:5,name:'חלב טרי 1 ל"ר',qty:4,unit:'קרטונים',min:3,price:7.5,weekUsage:2},
+  {id:6,name:'כוסות נייר 50 יח',qty:3,unit:'אריזות',min:2,price:12,weekUsage:0.5},
+];
+
+let items=JSON.parse(localStorage.getItem(STOR)||'null')||DEF;
+let log=JSON.parse(localStorage.getItem(LOGS)||'[]');
+let remind=JSON.parse(localStorage.getItem(REMS)||'null')||{days:7,lastCheck:Date.now()};
+let hist=JSON.parse(localStorage.getItem(HIST)||'{}');
+let nid=Math.max(...items.map(i=>i.id),0)+1;
+
+function save(){
+  localStorage.setItem(STOR,JSON.stringify(items));
+  localStorage.setItem(LOGS,JSON.stringify(log));
+  localStorage.setItem(REMS,JSON.stringify(remind));
+  localStorage.setItem(HIST,JSON.stringify(hist));
+}
+
+function addLog(msg){
+  const d=new Date();
+  const t=d.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  log.unshift({t,msg});if(log.length>60)log.pop();save();renderLog();
+}
+
+function daysLeft(item){
+  if(!item.weekUsage||item.qty===0)return null;
+  return Math.round((item.qty/item.weekUsage)*7);
+}
+
+function statusOf(item){
+  if(item.qty===0)return{cls:'out',badge:'badge-out',txt:'אזל'};
+  if(item.qty<=item.min)return{cls:'low',badge:'badge-low',txt:'נמוך'};
+  return{cls:'ok',badge:'badge-ok',txt:'תקין'};
+}
+
+function renderMetrics(){
+  const low=items.filter(i=>i.qty<=i.min&&i.qty>0).length;
+  const out=items.filter(i=>i.qty===0).length;
+  const val=items.reduce((s,i)=>s+(i.qty*(i.price||0)),0);
+  document.getElementById('metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">פריטים</div><div class="metric-value">${items.length}</div></div>
+    <div class="metric"><div class="metric-label">נמוך</div><div class="metric-value" style="${low?'color:#BA7517':''}">${low}</div></div>
+    <div class="metric"><div class="metric-label">אזל</div><div class="metric-value" style="${out?'color:#E24B4A':''}">${out}</div></div>
+    <div class="metric"><div class="metric-label">שווי ₪</div><div class="metric-value">${val.toFixed(0)}</div></div>`;
+}
+
+function renderAlerts(){
+  const el=document.getElementById('alerts');
+  let html='';
+  const out=items.filter(i=>i.qty===0);
+  const low=items.filter(i=>i.qty>0&&i.qty<=i.min);
+  const urgent=items.filter(i=>{const d=daysLeft(i);return d!==null&&d<=5;});
+  if(out.length)html+=`<div class="alert alert-danger">⚠ נגמר: ${out.map(i=>i.name).join(', ')}</div>`;
+  if(low.length)html+=`<div class="alert alert-warning">↓ מלאי נמוך: ${low.map(i=>i.name).join(', ')}</div>`;
+  if(urgent.filter(i=>i.qty>0).length)html+=`<div class="alert alert-warning">⏱ יסתיים תוך 5 ימים: ${urgent.filter(i=>i.qty>0).map(i=>i.name+' ('+daysLeft(i)+' ימים)').join(', ')}</div>`;
+  const nextRem=remind.lastCheck+(remind.days*86400000);
+  if(Date.now()>nextRem)html+=`<div class="alert alert-info">🔔 הגיע הזמן לבדוק את המלאי!</div>`;
+  el.innerHTML=html;
+}
+
+function renderItems(){
+  const el=document.getElementById('items-list');
+  el.innerHTML=items.map(item=>{
+    const s=statusOf(item);
+    const d=daysLeft(item);
+    const pct=item.min>0?Math.min(1,item.qty/(item.min*2.5)):0.8;
+    const barColor=item.qty===0?'#E24B4A':item.qty<=item.min?'#EF9F27':'#639922';
+    const dStr=d===null?'':(d<=5?`<span style="color:#E24B4A">⏱ ${d} ימים</span>`:d<=14?`<span style="color:#BA7517">${d} ימים</span>`:`<span>${d} ימים</span>`);
+    return`<div class="item-card ${s.cls}" id="icard-${item.id}">
+      <div class="item-top">
+        <div class="item-name">${item.name}</div>
+        <div class="item-badges">
+          ${dStr}
+          <span class="badge ${s.badge}">${s.txt}</span>
+          <button onclick="removeItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:0 0 0 4px" aria-label="מחק">×</button>
+        </div>
+      </div>
+      <div class="item-row">
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="change(${item.id},-1)" aria-label="הפחת">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="change(${item.id},1)" aria-label="הוסף">+</button>
+          <span class="qty-unit">${item.unit}</span>
+        </div>
+        <div class="item-meta">
+          <span>₪${(item.price||0).toFixed(1)}</span>
+          <span>
+            <input type="number" value="${(item.weekUsage||0).toFixed(1)}" min="0" step="0.1"
+              onchange="updateUsage(${item.id},this.value)"
+              style="width:44px;font-size:12px;padding:2px 5px;border:0.5px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text3)">/שבוע
+          </span>
+        </div>
+      </div>
+      <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(pct*100)}%;background:${barColor}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderReminder(){
+  document.getElementById('remind-days').value=remind.days;
+  const next=new Date(remind.lastCheck+(remind.days*86400000));
+  document.getElementById('next-remind').textContent=next.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'});
+  const d=new Date(remind.lastCheck);
+  document.getElementById('last-check-label').textContent='בדיקה אחרונה: '+d.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'});
+}
+
+function renderLog(){
+  const el=document.getElementById('log-list');
+  el.innerHTML=log.slice(0,10).map(l=>`<div class="log-item"><span>${l.msg}</span><span class="log-time">${l.t}</span></div>`).join('')||'<div style="font-size:13px;color:var(--text3);padding:8px 0">אין פעולות עדיין</div>';
+}
+
+function render(){renderMetrics();renderAlerts();renderItems();renderReminder();renderLog();}
+
+function change(id,delta){
+  const item=items.find(i=>i.id===id);if(!item)return;
+  const prev=item.qty;
+  item.qty=Math.max(0,item.qty+delta);
+  if(item.qty===prev)return;
+  if(delta<0){
+    hist[id]=hist[id]||[];
+    hist[id].push({d:Date.now(),a:1});
+    if(hist[id].length>200)hist[id].shift();
+    learnUsage(id);
+  }
+  addLog(`${delta>0?'+'+delta:delta} ${item.unit} — ${item.name} (כעת: ${item.qty})`);
+  save();render();
+}
+
+function learnUsage(id){
+  const item=items.find(i=>i.id===id);if(!item)return;
+  const h=(hist[id]||[]).slice(-20);if(h.length<3)return;
+  const span=(h[h.length-1].d-h[0].d)/(7*86400000);if(span<0.1)return;
+  const total=h.reduce((s,e)=>s+e.a,0);
+  item.weekUsage=Math.round((total/span)*10)/10;
+  save();
+}
+
+function updateUsage(id,val){
+  const item=items.find(i=>i.id===id);if(!item)return;
+  item.weekUsage=Math.max(0,parseFloat(val)||0);
+  save();render();
+}
+
+function removeItem(id){
+  const item=items.find(i=>i.id===id);
+  if(!confirm('למחוק את '+item.name+'?'))return;
+  items=items.filter(i=>i.id!==id);
+  addLog('הוסר: '+item.name);save();render();
+}
+
+function addItem(){
+  const name=document.getElementById('fn').value.trim();
+  if(!name){alert('יש להזין שם');return;}
+  const qty=parseFloat(document.getElementById('fq').value)||0;
+  const unit=document.getElementById('fu').value.trim()||'יחידות';
+  const min=parseFloat(document.getElementById('fm').value)||1;
+  const price=parseFloat(document.getElementById('fp').value)||0;
+  const weekUsage=parseFloat(document.getElementById('fw').value)||0;
+  items.push({id:nid++,name,qty,unit,min,price,weekUsage});
+  addLog('נוסף: '+name+' ('+qty+' '+unit+', ₪'+price.toFixed(1)+')');
+  save();render();closeAdd();
+  ['fn','fq','fu','fm','fp','fw','fwu'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+function setReminder(){
+  remind.days=parseInt(document.getElementById('remind-days').value)||7;
+  save();renderReminder();addLog('תזכורת עודכנה: כל '+remind.days+' ימים');
+}
+
+function checkNow(){
+  remind.lastCheck=Date.now();save();render();addLog('בדיקת מלאי בוצעה');
+}
+
+function openAdd(){document.getElementById('overlay').classList.add('open');document.getElementById('fn').focus();}
+function closeAdd(){document.getElementById('overlay').classList.remove('open');}
+
+async function askAI(mode){
+  const el=document.getElementById('ai-text');
+  const actEl=document.getElementById('ai-actions');
+  el.className='ai-text loading';
+  el.textContent='מנתח...';actEl.innerHTML='';
+  const summary=items.map(i=>{
+    const d=daysLeft(i);
+    return `${i.name}: ${i.qty} ${i.unit} (מינימום ${i.min}, שבועי ${i.weekUsage||0}${d!==null?', '+d+' ימים':''}, ₪${i.price||0})`;
+  }).join('\n');
+  const low=items.filter(i=>i.qty<=i.min);
+  const out=items.filter(i=>i.qty===0);
+  let prompt='';
+  if(mode==='analyze'){
+    prompt=`מנהל מלאי חכם למשרד ישראלי. המלאי:\n${summary}\nנמוך: ${low.map(i=>i.name).join(', ')||'אין'}. אזל: ${out.map(i=>i.name).join(', ')||'אין'}.\nניתוח קצר (3-5 משפטים): מה דחוף, כמה זמן יספיק, עלות הזמנה מלאה. עברית, ענייני.`;
+  } else {
+    prompt=`מנהל מלאי חכם למשרד ישראלי. המלאי:\n${summary}\nרשימת קניות מחושבת לשופרסל — רק מה שצריך (אזל/נמוך/פחות מ-2 שבועות). עבור כל פריט: מה לקנות, כמה, עלות. בסוף: סה"כ משוער. עברית, מסודר.`;
+  }
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const text=data.content?.map(c=>c.text||'').join('')||'שגיאה';
+    el.className='ai-text';el.textContent=text;
+    addLog('ניתוח AI: '+mode);
+  }catch(e){el.className='ai-text';el.textContent='שגיאה בחיבור. נסי שוב.';}
+}
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+render();
+</script>
+</body>
+</html>
